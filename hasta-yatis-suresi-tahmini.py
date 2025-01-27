@@ -7,7 +7,7 @@ import seaborn as sns
 
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OrdinalEncoder
-from sklearn.metrics import mean_squared_error, classification_report
+from sklearn.metrics import mean_squared_error, classification_report, accuracy_score
 from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 
 # ---------- Import Data and Perform EDA ----------
@@ -84,18 +84,53 @@ df["Emergency Department Indicator"] = encoder.fit_transform(np.asarray(df["Emer
 df.isna().sum()
 
 
+df = df.drop("CCSR Procedure Code", axis=1)
+df = df.dropna(subset=["Permanent Facility Id", "CCSR Diagnosis Code"])
+
+
+# ---------- Train-Test Split ----------
+
+X = df.drop(["Length of Stay"], axis=1)
+y = df["Length of Stay"]
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
 
 
+#---------- Regression ----------
+
+dtree = DecisionTreeRegressor(max_depth = 10)
+dtree.fit(X_train, y_train)
+train_prediction = dtree.predict(X_train)
+test_prediction = dtree.predict(X_test)
+
+print("RMSE: Train: ", np.sqrt(mean_squared_error(y_train, train_prediction)))
+print("RMSE: Test: ", np.sqrt(mean_squared_error(y_test, test_prediction)))
 
 
+bins = [0, 5, 10, 20, 30, 50, 120]
+labels = [5, 10, 20, 30, 50, 120]
 
+df["los_bin"] = pd.cut(x=df["Length of Stay"], bins=bins)
+df["los_label"] = pd.cut(x=df["Length of Stay"], bins=bins, labels=labels)
+df = df.head(50)
+df["los_bin"] = df["los_bin"].apply(lambda x: str(x).replace(",", "-"))
+df["los_bin"] = df["los_bin"].apply(lambda x: str(x).replace("120", "120+"))
 
+f, ax = plt.subplots()
+sns.countplot(x="los_bin", data=df)
 
+new_X = df.drop(["Length of Stay", "los_bin", "los_label"], axis=1)
+new_y = df["los_label"]
 
+X_train, X_test, y_train, y_test = train_test_split(new_X, new_y, test_size=0.2, random_state=42)
 
+dtree = DecisionTreeClassifier(max_depth=10)
+dtree.fit(X_train, y_train)
 
+train_prediction = dtree.predict(X_train)
+test_prediction = dtree.predict(X_test)
 
-
-
-
+print("Train Accuracy: ", accuracy_score(y_train, train_prediction))
+print("Test Accuracy: ", accuracy_score(y_test, test_prediction))
+print("Classification report: ", classification_report(y_test, test_prediction))
