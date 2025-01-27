@@ -2,7 +2,7 @@
 
 Bu proje, **New York State SPARCS Hospital Discharge** veri seti kullanılarak hastaların hastanede kalış sürelerini tahmin etmek için çeşitli veri analizi ve makine öğrenimi tekniklerini içermektedir. Proje, hem regresyon hem de sınıflandırma modelleri kullanarak hasta yatış süresi ile ilgili tahminler yapmayı amaçlamaktadır.
 
----
+
 
 ## Veri Seti
 
@@ -15,7 +15,6 @@ Proje, **Hospital Inpatient Discharges (SPARCS)** adlı veri setini kullanmaktad
 - **Payment Typology:** Hastanın ödeme yöntemi.
 - **Race, Ethnicity:** Hastanın demografik bilgileri.
 
----
 
 ## Proje Adımları
 
